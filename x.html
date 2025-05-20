@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disegna X sul Mouse</title>
+    <script src="https://cdn.tailwzsindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden; /* Nasconde le scrollbar */
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Sfondo chiaro */
+            cursor: none; /* Nasconde il cursore predefinito del mouse */
+        }
+        canvas {
+            display: block;
+            background-color: transparent; /* Il canvas è trasparente per mostrare lo sfondo del body */
+        }
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            text-align: center;
+            display: none; /* Inizialmente nascosto */
+        }
+        .message-box button {
+            background-color: #3b82f6; /* Blu di Tailwind */
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.3s ease;
+        }
+        .message-box button:hover {
+            background-color: #2563eb; /* Blu più scuro al passaggio del mouse */
+        }
+    </style>
+</head>
+<body>
+    <canvas id="xCanvas"></canvas>
+
+    <div id="messageBox" class="message-box">
+        <p id="messageText"></p>
+        <button onclick="hideMessageBox()">OK</button>
+    </div>
+
+    <script>
+        // Ottiene il riferimento al canvas e al suo contesto 2D
+        const canvas = document.getElementById('xCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Imposta la dimensione del canvas per riempire la finestra
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        // Ridimensiona il canvas all'avvio e ad ogni ridimensionamento della finestra
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas(); // Chiamata iniziale per impostare le dimensioni
+
+        // Variabili per le coordinate del mouse
+        let mouseX = 0;
+        let mouseY = 0;
+
+        // Dimensione del simbolo (diametro del cerchio)
+        const symbolSize = 40; // Il simbolo sarà un cerchio di 40px di diametro
+
+        // Funzione per disegnare il simbolo "X" come nell'immagine fornita
+        function drawX(x, y) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Pulisce l'intero canvas
+
+            // Disegna il cerchio rosso
+            ctx.beginPath();
+            ctx.arc(x, y, symbolSize / 2, 0, Math.PI * 2, false); // Cerchio centrato su (x, y)
+            ctx.fillStyle = '#dc2626'; // Colore rosso scuro (Tailwind red-600)
+            ctx.fill(); // Riempi il cerchio
+
+            // Disegna la "X" bianca all'interno del cerchio
+            ctx.beginPath();
+            ctx.strokeStyle = '#ffffff'; // Colore bianco per la "X"
+            ctx.lineWidth = 4; // Spessore della linea della "X"
+
+            // Calcola la dimensione della "X" interna per adattarla al cerchio
+            const innerXSize = symbolSize * 0.6; // La "X" sarà circa il 60% della dimensione del cerchio
+
+            // Disegna la prima linea (da sinistra in alto a destra in basso)
+            ctx.moveTo(x - innerXSize / 2, y - innerXSize / 2);
+            ctx.lineTo(x + innerXSize / 2, y + innerXSize / 2);
+
+            // Disegna la seconda linea (da destra in alto a sinistra in basso)
+            ctx.moveTo(x + innerXSize / 2, y - innerXSize / 2);
+            ctx.lineTo(x - innerXSize / 2, y + innerXSize / 2);
+
+            ctx.stroke(); // Applica il disegno della "X"
+        }
+
+        // Listener per il movimento del mouse
+        document.addEventListener('mousemove', (event) => {
+            // Aggiorna le coordinate del mouse
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+            // Disegna il simbolo alle nuove coordinate
+            drawX(mouseX, mouseY);
+        });
+
+        // Funzioni per la message box personalizzata
+        function showMessageBox(message) {
+            const messageBox = document.getElementById('messageBox');
+            const messagetext = document.getElementById('messageText');
+            messageText.textContent = message;
+            messageBox.style.display = 'block';
+        }
+
+        function hideMessageBox() {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.style.display = 'none';
+        }
+
+        // Gestione degli errori
+        window.onerror = (message, source, lineno, colno, error) => {
+            console.error("Si è verificato un errore:", message, source, lineno, colno, error);
+            showMessageBox("Si è verificato un errore: " + message);
+            return true; // Impedisce la propagazione dell'errore al browser
+        };
+
+    </script>
+</body>
+</html>
